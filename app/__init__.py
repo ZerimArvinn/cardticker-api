@@ -1,0 +1,2 @@
+"""CardTicker Trades API."""
+
