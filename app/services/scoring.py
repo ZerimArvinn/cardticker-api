@@ -172,7 +172,7 @@ def generate_explanation(
     
     # Value summary
     explanation.append(
-        f"Proposer offers ${offer_total / 100:.2f} worth of cards and wants ${want_total / 100:.2f} in return."
+        f"Proposer offers ${offer_total / 100:.2f} total value and wants ${want_total / 100:.2f} in return."
     )
     
     # Fairness
@@ -204,22 +204,27 @@ def compute_proposal_scores(db: Session, proposal: TradeProposal) -> ProposalSco
     # Get proposal items
     offered_items = [item for item in proposal.items if item.side == "offer"]
     wanted_items = [item for item in proposal.items if item.side == "want"]
-    
-    # Calculate totals
-    offer_total = calculate_total_value(db, offered_items)
-    want_total = calculate_total_value(db, wanted_items)
-    
+
+    # Calculate totals (cards only)
+    offer_cards_total = calculate_total_value(db, offered_items)
+    want_cards_total = calculate_total_value(db, wanted_items)
+
+    # Add cash to the offer total (proposer is offering cash + cards)
+    cash_amount = proposal.cash_amount_cents or 0
+    offer_total = offer_cards_total + cash_amount
+    want_total = want_cards_total
+
     # Compute scores
     fairness, diff, diff_desc = compute_fairness_score(offer_total, want_total)
     volatility = compute_volatility_score(db, offered_items + wanted_items)
     liquidity = compute_liquidity_score(db, offered_items + wanted_items)
-    
+
     # Generate explanation
     explanation = generate_explanation(
         fairness, volatility, liquidity,
         offer_total, want_total, diff, diff_desc
     )
-    
+
     return ProposalScores(
         fairness_score=fairness,
         liquidity_score=liquidity,

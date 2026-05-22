@@ -10,14 +10,16 @@ from app.database import Base
 
 class TradeProposal(Base):
     """Trade proposal model."""
-    
+
     __tablename__ = "trade_proposals"
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     trade_id = Column(UUID(as_uuid=True), ForeignKey("trades.id", ondelete="CASCADE"), nullable=False)
     proposer_user_id = Column(UUID(as_uuid=True), ForeignKey("users.id"), nullable=True)
     proposer_name = Column(String, nullable=True)
+    cash_amount_cents = Column(Integer, nullable=True)  # Cash adjustment in cents (optional)
     status = Column(String, nullable=False, default="submitted")
+    viewed_at = Column(DateTime(timezone=True), nullable=True)  # When seller viewed the proposal
     created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
 
     # Relationships

@@ -31,6 +31,7 @@ class ProposalItem(BaseModel):
 class ProposalCreate(BaseModel):
     """Schema for creating a proposal."""
     proposer_name: Optional[str] = None
+    cash_amount_cents: Optional[int] = None
     offered_items: List[ProposalItemCreate]
     wanted_items: List[ProposalItemCreate]
 
@@ -38,11 +39,14 @@ class ProposalCreate(BaseModel):
 class Proposal(BaseModel):
     """Schema for proposal response."""
     model_config = ConfigDict(from_attributes=True)
-    
+
     id: UUID
     trade_id: UUID
+    proposer_user_id: Optional[UUID] = None
     proposer_name: Optional[str] = None
+    cash_amount_cents: Optional[int] = None
     status: str
+    viewed_at: Optional[datetime] = None
     created_at: datetime
 
 
@@ -65,4 +69,6 @@ class ProposalDetail(Proposal):
     offered_items: List[ProposalItem] = []
     wanted_items: List[ProposalItem] = []
     scores: Optional[ProposalScores] = None
+    trade_slug: Optional[str] = None
+    trade_creator_user_id: Optional[UUID] = None
 
